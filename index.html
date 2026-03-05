@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" id="themeColor" content="#ffffff">
+<title>ZIPP — MZ 데일리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F6F8;--surface:#fff;--surface2:#F0F2F5;--border:#E8EBF0;--border2:#D1D9E0;
+  --t1:#191F28;--t2:#6B7684;--t3:#B0B8C1;
+  --blue:#3182F6;--bdim:rgba(49,130,246,.10);
+  --green:#05C072;--gdim:rgba(5,192,114,.10);
+  --red:#F04452;--rdim:rgba(240,68,82,.10);
+  --orange:#FF6B2C;--odim:rgba(255,107,44,.10);
+  --pink:#FF3E6C;--pdim:rgba(255,62,108,.10);
+  --yellow:#FFB800;--ydim:rgba(255,184,0,.10);
+  --purple:#6C5CE7;--vdim:rgba(108,92,231,.10);
+  --sh1:0 1px 4px rgba(0,0,0,.06);--sh2:0 3px 12px rgba(0,0,0,.09);
+  --r1:10px;--r2:14px;--r3:18px;--r4:22px;
+  --navh:62px;--safe:env(safe-area-inset-bottom,0px);
+}
+[data-theme=dark]{
+  --bg:#0D0F17;--surface:#181B27;--surface2:#222535;--border:#2A2E40;--border2:#363B52;
+  --t1:#EEF0F8;--t2:#8890A8;--t3:#444C66;
+  --blue:#5BA3FF;--bdim:rgba(91,163,255,.13);
+  --green:#06D480;--gdim:rgba(6,212,128,.13);
+  --red:#FF5B68;--rdim:rgba(255,91,104,.13);
+  --orange:#FF7D45;--odim:rgba(255,125,69,.13);
+  --pink:#FF5580;--pdim:rgba(255,85,128,.13);
+  --yellow:#FFC233;--ydim:rgba(255,194,51,.13);
+  --purple:#9B8EFF;--vdim:rgba(155,142,255,.13);
+  --sh1:0 1px 4px rgba(0,0,0,.35);--sh2:0 3px 12px rgba(0,0,0,.4);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{
+  height:100%;background:var(--bg);color:var(--t1);
+  font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+  overflow:hidden;max-width:480px;margin:0 auto;
+  transition:background .25s,color .25s;
+}
+button,input,textarea{font-family:inherit}
+
+/* ──────────────── LAYOUT ──────────────── */
+#app{display:flex;flex-direction:column;height:100%;position:relative;overflow:hidden}
+
+.sbar{
+  background:var(--surface);padding:10px 18px 4px;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
+  transition:background .25s;
+}
+.sbar-time{font-size:14px;font-weight:800;letter-spacing:-.3px}
+.sbar-icons{font-size:12px;display:flex;gap:3px}
+
+.tnav{
+  background:var(--surface);padding:5px 14px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+  transition:background .25s,border-color .25s;
+}
+.logo{display:flex;align-items:center;gap:7px;cursor:default}
+.logo-m{
+  width:32px;height:32px;background:var(--blue);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:900;color:#fff;
+  box-shadow:0 2px 8px rgba(49,130,246,.35);
+}
+.logo-n{font-size:20px;font-weight:900;letter-spacing:-1px}
+.tna{display:flex;gap:5px}
+.ibtn{
+  width:36px;height:36px;border-radius:50%;background:var(--surface2);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:16px;position:relative;transition:transform .1s,background .15s;
+}
+.ibtn:active{transform:scale(.9)}
+.npip{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--surface)}
+
+.pages{flex:1;overflow:hidden;position:relative}
+.page{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding-bottom:calc(var(--navh) + var(--safe) + 8px);
+  opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity .2s,transform .2s;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.page::-webkit-scrollbar{display:none}
+.page.active{opacity:1;transform:none;pointer-events:all}
+
+.bnav{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--surface);border-top:1px solid var(--border);
+  display:flex;padding:8px 0 calc(5px + var(--safe));
+  z-index:50;transition:background .25s,border-color .25s;
+}
+.nbtn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:1px 0;transition:transform .12s;
+}
+.nbtn:active{transform:scale(.87)}
+.ni{font-size:21px;line-height:1;filter:grayscale(1) opacity(.38);transition:filter .2s}
+.nl{font-size:10px;font-weight:600;color:var(--t3);transition:color .2s}
+.nbtn.active .ni{filter:none}
+.nbtn.active .nl{color:var(--blue);font-weight:800}
+
+/* ──────────────── COMPONENTS ──────────────── */
+.card{background:var(--surface);border-radius:var(--r3);margin:0 12px 10px;overflow:hidden;box-shadow:var(--sh1);transition:background .25s}
+.sh{display:flex;align-items:center;justify-content:space-between;padding:16px 14px 9px}
+.st{font-size:16px;font-weight:800}
+.sm2{font-size:13px;font-weight:700;color:var(--blue);cursor:pointer}
+.chip{display:inline-flex;align-items:center;padding:4px 9px;border-radius:100px;font-size:11px;font-weight:700}
+.hscroll{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding:0 12px}
+.hscroll::-webkit-scrollbar{display:none}
+
+.abtn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:8px 14px;background:var(--blue);color:#fff;
+  border:none;border-radius:100px;font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;transition:opacity .12s,transform .1s;
+}
+.abtn:active{opacity:.8;transform:scale(.95)}
+.abtn:disabled{opacity:.5;pointer-events:none}
+.abtn.sm{padding:6px 11px;font-size:11px}
+
+.obtn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:7px 12px;border-radius:100px;font-size:12px;font-weight:700;
+  border:1.5px solid var(--border2);background:var(--surface);color:var(--t1);
+  cursor:pointer;transition:background .1s,transform .1s;
+}
+.obtn:active{background:var(--surface2);transform:scale(.95)}
+
+.badge{font-size:11px;font-weight:700;padding:2px 7px;border-radius:100px}
+.br{background:var(--rdim);color:var(--red)}
+.bg2{background:var(--gdim);color:var(--green)}
+.bb{background:var(--bdim);color:var(--blue)}
+.bo{background:var(--odim);color:var(--orange)}
+.bv{background:var(--vdim);color:var(--purple)}
+
+.div2{height:1px;background:var(--border);margin:0 14px}
+
+.sk{background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.3s infinite;border-radius:7px}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+
+.up{color:var(--red)}.dn{color:var(--blue)}.flat{color:var(--t2)}
+.upbg{background:var(--rdim);color:var(--red)}
+.dnbg{background:var(--bdim);color:var(--blue)}
+.flatbg{background:var(--surface2);color:var(--t2)}
+
+.livedot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);animation:livepulse 1.6s ease infinite;vertical-align:middle;margin-right:4px}
+@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fu .26s ease both}
+.fi:nth-child(1){animation-delay:.03s}.fi:nth-child(2){animation-delay:.07s}
+.fi:nth-child(3){animation-delay:.11s}.fi:nth-child(4){animation-delay:.15s}
+.fi:nth-child(5){animation-delay:.19s}.fi:nth-child(6){animation-delay:.23s}
+.fi:nth-child(7){animation-delay:.27s}.fi:nth-child(8){animation-delay:.31s}
+
+/* ──────────────── HOME ──────────────── */
+.aibanner{
+  margin:10px 12px 0;padding:13px 14px;
+  background:linear-gradient(135deg,var(--blue) 0%,#5EA7FF 100%);
+  border-radius:var(--r3);display:flex;gap:11px;align-items:center;
+  box-shadow:0 4px 16px rgba(49,130,246,.28);
+}
+.aib-ico{width:38px;height:38px;background:rgba(255,255,255,.18);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.aib-tx{color:#fff}
+.aib-t{font-size:13px;font-weight:800;margin-bottom:2px}
+.aib-s{font-size:11px;opacity:.85}
+
+.qgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;padding:12px 12px 4px}
+.qcat{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.qcat-i{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .13s}
+.qcat:active .qcat-i{transform:scale(.86)}
+.qcat-l{font-size:10px;font-weight:700;color:var(--t2)}
+
+.fcard{background:var(--surface);border-radius:var(--r3);margin:0 12px 10px;overflow:hidden;box-shadow:var(--sh1);cursor:pointer;transition:background .25s}
+.fcard-th{height:140px;display:flex;align-items:center;justify-content:center;font-size:64px;position:relative}
+.fcard-bd{padding:12px 14px 14px}
+.fcard-tt{font-size:15px;font-weight:800;line-height:1.4;margin-bottom:5px}
+.fcard-ds{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:12px}
+.fcard-ft{display:flex;align-items:center;justify-content:space-between;gap:7px}
+.tags{display:flex;gap:4px;flex-wrap:wrap}
+.tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:100px;background:var(--surface2);color:var(--t2)}
+
+.dcard{min-width:178px;background:var(--surface);border-radius:var(--r2);padding:12px;box-shadow:var(--sh1);cursor:pointer;flex-shrink:0;transition:background .25s}
+.dcard-ico{font-size:24px;margin-bottom:7px}
+.dcard-n{font-size:12px;font-weight:800;margin-bottom:2px}
+.dcard-m{font-size:11px;color:var(--t3);margin-bottom:7px}
+.dcard-pr{display:flex;align-items:center;gap:6px}
+
+.titem{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.titem:last-child{border-bottom:none}
+.titem:active{background:var(--surface2)}
+.tico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-right:11px;flex-shrink:0}
+.tnm{font-size:14px;font-weight:700}
+.tsb{font-size:11px;color:var(--t3);margin-top:1px}
+.trt{text-align:right}
+.tpr{font-size:14px;font-weight:800;margin-bottom:3px}
+.tch{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px}
+
+.wcard{background:var(--surface);border-radius:var(--r3);margin:0 12px 10px;padding:16px 14px;box-shadow:var(--sh1);position:relative;overflow:hidden;transition:background .25s}
+.wcard::after{content:attr(data-w);position:absolute;right:8px;top:2px;font-size:72px;font-weight:900;color:var(--bdim);line-height:1;pointer-events:none}
+.wday{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px}
+.wmn{font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:2px}
+.wpr{font-size:12px;color:var(--t3);margin-bottom:9px}
+.wdf{font-size:13px;line-height:1.62;color:var(--t2);margin-bottom:9px}
+.wex{background:var(--bdim);border-radius:var(--r1);padding:9px 12px;font-size:12px;line-height:1.5;margin-bottom:12px}
+.wacts{display:flex;gap:6px;flex-wrap:wrap}
+
+.mitem{padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.mitem:last-child{border-bottom:none}
+.mitem:active{background:var(--surface2)}
+.mt{font-size:13px;font-weight:700;margin-bottom:2px}
+.ms{font-size:12px;color:var(--t2)}
+
+/* ──────────────── EXPLORE ──────────────── */
+.sbar2{
+  margin:10px 12px 0;background:var(--surface2);border-radius:var(--r2);
+  padding:10px 12px;display:flex;align-items:center;gap:8px;
+  border:1.5px solid var(--border);transition:border-color .15s;
+}
+.sbar2:focus-within{border-color:var(--blue)}
+.sinput{flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--t1)}
+.sinput::placeholder{color:var(--t3)}
+
+.egrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 12px}
+.eitem{background:var(--surface);border-radius:var(--r2);padding:13px;cursor:pointer;box-shadow:var(--sh1);transition:transform .12s;border-top:3px solid transparent}
+.eitem:active{transform:scale(.96)}
+.ei-ico{font-size:24px;margin-bottom:6px}
+.ei-n{font-size:13px;font-weight:800;margin-bottom:2px}
+.ei-c{font-size:11px;color:var(--t3)}
+
+.tritem{display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.tritem:last-child{border-bottom:none}
+.tritem:active{background:var(--surface2)}
+.trank{font-size:14px;font-weight:900;color:var(--blue);width:24px;flex-shrink:0}
+.trinfo{flex:1}
+.trn{font-size:13px;font-weight:700}
+.trs{font-size:11px;color:var(--t3);margin-top:1px}
+
+.wmini{min-width:126px;background:var(--surface);border-radius:var(--r2);padding:12px;box-shadow:var(--sh1);cursor:pointer;flex-shrink:0;transition:background .25s}
+.wmt{font-size:10px;font-weight:700;margin-bottom:4px}
+.wmw{font-size:18px;font-weight:900;margin-bottom:3px}
+.wmd{font-size:11px;color:var(--t2);line-height:1.35}
+
+/* ──────────────── AI PAGE ──────────────── */
+.aihero{
+  margin:10px 12px 0;background:linear-gradient(135deg,#18203A 0%,#2C3560 100%);
+  border-radius:var(--r4);padding:18px 16px;position:relative;overflow:hidden;
+}
+.aihero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 72% 40%,rgba(91,163,255,.2) 0%,transparent 65%)}
+.ah-b{font-size:10px;font-weight:700;color:rgba(255,255,255,.42);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.ah-t{font-size:20px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:4px}
+.ah-s{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:14px}
+.aichips{display:flex;gap:5px;flex-wrap:wrap}
+.aic{padding:6px 11px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.13);border-radius:100px;font-size:11px;font-weight:600;color:rgba(255,255,255,.82);cursor:pointer;transition:background .12s}
+.aic:active{background:rgba(255,255,255,.2)}
+
+.chatbox{background:var(--surface);border-radius:var(--r3);margin:10px 12px 0;overflow:hidden;box-shadow:var(--sh1);transition:background .25s}
+.chathead{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
+.chav{width:34px;height:34px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:17px}
+.chn{font-size:13px;font-weight:800}
+.chs{font-size:11px;color:var(--green);font-weight:600}
+.chatmsgs{padding:11px 14px;display:flex;flex-direction:column;gap:8px;min-height:80px;max-height:240px;overflow-y:auto;scrollbar-width:none}
+.chatmsgs::-webkit-scrollbar{display:none}
+.bub{max-width:80%;padding:9px 12px;border-radius:13px;font-size:13px;line-height:1.52}
+.bub.ai{background:var(--surface2);color:var(--t1);align-self:flex-start;border-bottom-left-radius:4px}
+.bub.user{background:var(--blue);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chatinp{padding:9px 12px;border-top:1px solid var(--border);display:flex;gap:6px;align-items:center}
+.cinput{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:18px;padding:8px 12px;font-size:13px;color:var(--t1);outline:none}
+.cinput:focus{border-color:var(--blue)}
+.csend{width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:#fff;transition:transform .1s}
+.csend:active{transform:scale(.87)}
+.qqs .qi{padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.qqs .qi:last-child{border-bottom:none}
+.qqs .qi:active{background:var(--surface2)}
+.qi-q{font-size:13px;font-weight:700;margin-bottom:2px}
+.qi-a{font-size:11px;color:var(--t2)}
+
+/* ──────────────── SAVE ──────────────── */
+.sempty{display:flex;flex-direction:column;align-items:center;padding:50px 18px;text-align:center}
+.seico{font-size:50px;margin-bottom:12px}
+.set{font-size:16px;font-weight:800;margin-bottom:6px}
+.ses{font-size:13px;color:var(--t2);line-height:1.5}
+.sitem{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.sitem:last-child{border-bottom:none}
+.sico{width:42px;height:42px;border-radius:11px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sinf{flex:1;min-width:0}
+.scat{font-size:10px;font-weight:700;color:var(--blue);margin-bottom:2px}
+.stit{font-size:13px;font-weight:700;line-height:1.3;margin-bottom:1px}
+.stm{font-size:11px;color:var(--t3)}
+.sdel{background:none;border:none;font-size:15px;color:var(--t3);cursor:pointer;padding:2px;flex-shrink:0}
+
+/* ──────────────── PROFILE ──────────────── */
+.ptop{background:var(--surface);padding:16px 14px 0;transition:background .25s}
+.prow{display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.pav{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.pn{font-size:16px;font-weight:900;margin-bottom:2px}
+.ps{font-size:12px;color:var(--t2)}
+.pedit{margin-left:auto;padding:6px 12px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:100px;font-size:12px;font-weight:700;cursor:pointer}
+.pstats{display:flex;padding:13px 0;border-bottom:1px solid var(--border)}
+.pst{flex:1;text-align:center}
+.pst+.pst{border-left:1px solid var(--border)}
+.pstn{font-size:19px;font-weight:900}
+.pstl{font-size:11px;color:var(--t3);margin-top:2px}
+.pintwrap{padding:11px 0 16px}
+.pint-t{font-size:12px;font-weight:700;color:var(--t2);margin-bottom:8px}
+.pintags{display:flex;gap:5px;flex-wrap:wrap}
+.pintag{padding:5px 11px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;transition:all .14s}
+.pintag.on{background:var(--blue);color:#fff}
+.pintag.off{background:var(--surface2);color:var(--t2);border:1.5px solid var(--border2)}
+
+.msec{background:var(--surface);margin-bottom:7px;transition:background .25s}
+.mmi{display:flex;align-items:center;padding:13px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.mmi:last-child{border-bottom:none}
+.mmi:active{background:var(--surface2)}
+.mmico{font-size:19px;width:28px;flex-shrink:0}
+.mmtx{font-size:14px;font-weight:600;flex:1}
+.mmr{font-size:13px;color:var(--t3)}
+.mmbdg{background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:100px}
+
+.dtoggle{position:relative;width:44px;height:24px;background:var(--border2);border-radius:12px;cursor:pointer;transition:background .25s;flex-shrink:0}
+.dtoggle.on{background:var(--blue)}
+.dtoggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .22s;box-shadow:0 1px 4px rgba(0,0,0,.22)}
+.dtoggle.on::after{transform:translateX(20px)}
+
+/* ──────────────── MODAL ──────────────── */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.52);backdrop-filter:blur(5px);z-index:200;opacity:0;pointer-events:none;transition:opacity .24s}
+.mbg.open{opacity:1;pointer-events:all}
+.msheet{
+  position:fixed;bottom:0;left:50%;transform:translate(-50%,100%);
+  width:100%;max-width:480px;background:var(--surface);
+  border-radius:20px 20px 0 0;z-index:201;
+  padding:0 0 calc(26px + var(--safe));
+  transition:transform .3s cubic-bezier(.22,.9,.36,1),background .25s;
+  max-height:84vh;overflow-y:auto;scrollbar-width:none;
+}
+.msheet::-webkit-scrollbar{display:none}
+.mbg.open .msheet{transform:translate(-50%,0)}
+.mhandle{width:34px;height:4px;background:var(--border2);border-radius:2px;margin:10px auto 16px}
+.mhd{padding:0 16px 12px;border-bottom:1px solid var(--border)}
+.mtit{font-size:16px;font-weight:800;margin-bottom:3px}
+.msub2{font-size:12px;color:var(--t2)}
+.mbdy{padding:13px 16px}
+.aresp{background:var(--surface2);border-radius:var(--r2);padding:13px;font-size:13px;line-height:1.68;min-height:65px}
+.dots{display:flex;gap:5px;padding:5px 0;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:db 1.2s ease infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes db{0%,100%{opacity:.22;transform:scale(.78)}50%{opacity:1;transform:scale(1)}}
+.mclose{width:calc(100% - 32px);margin:10px 16px 0;padding:12px;background:var(--surface2);border:none;border-radius:var(--r2);font-size:14px;font-weight:700;cursor:pointer;color:var(--t1);transition:background .12s}
+.mclose:active{background:var(--border)}
+
+/* ──────────────── TOAST ──────────────── */
+.toast{
+  position:fixed;bottom:calc(var(--navh) + 12px);left:50%;
+  transform:translateX(-50%) translateY(6px);
+  background:var(--t1);color:var(--surface);
+  padding:8px 16px;border-radius:100px;
+  font-size:12px;font-weight:700;z-index:300;
+  opacity:0;transition:all .2s;white-space:nowrap;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* finance update bar */
+.ubar{display:flex;align-items:center;justify-content:space-between;padding:4px 14px 8px}
+.utxt{font-size:10px;color:var(--t3)}
+.rfbtn{font-size:10px;font-weight:700;color:var(--blue);background:none;border:none;padding:3px;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- STATUS BAR -->
+<div class="sbar">
+  <div class="sbar-time" id="st">9:41</div>
+  <div class="sbar-icons">📶&nbsp;🔋</div>
+</div>
+
+<!-- TOP NAV -->
+<div class="tnav">
+  <div class="logo">
+    <div class="logo-m">Z</div>
+    <div class="logo-n">ZIPP</div>
+  </div>
+  <div class="tna">
+    <button class="ibtn" id="darkBtn" onclick="toggleDark()" title="다크모드">🌙</button>
+    <button class="ibtn" onclick="showPage('ai')">⚡</button>
+    <button class="ibtn">🔔<div class="npip"></div></button>
+  </div>
+</div>
+
+<!-- PAGES -->
+<div class="pages">
+
+<!-- ══ HOME ══ -->
+<div class="page active" id="page-home">
+
+  <div class="aibanner fi">
+    <div class="aib-ico">⚡</div>
+    <div class="aib-tx">
+      <div class="aib-t">오늘의 MZ 브리핑 준비 완료</div>
+      <div class="aib-s">실시간 데이터 · <span id="ab-cnt">로딩 중...</span></div>
+    </div>
+  </div>
+
+  <div class="qgrid fi">
+    <div class="qcat" onclick="scrollTo2('sec-food')"><div class="qcat-i" style="background:var(--odim)">🍜</div><div class="qcat-l">맛집</div></div>
+    <div class="qcat" onclick="scrollTo2('sec-stock')"><div class="qcat-i" style="background:var(--rdim)">📈</div><div class="qcat-l">재테크</div></div>
+    <div class="qcat" onclick="scrollTo2('sec-fashion')"><div class="qcat-i" style="background:var(--pdim)">👗</div><div class="qcat-l">패션</div></div>
+    <div class="qcat" onclick="scrollTo2('sec-trend')"><div class="qcat-i" style="background:var(--vdim)">🔥</div><div class="qcat-l">유행</div></div>
+    <div class="qcat" onclick="scrollTo2('sec-word')"><div class="qcat-i" style="background:var(--bdim)">💬</div><div class="qcat-l">신조어</div></div>
+    <div class="qcat" onclick="scrollTo2('sec-humor')"><div class="qcat-i" style="background:var(--ydim)">😂</div><div class="qcat-l">유머</div></div>
+  </div>
+
+  <!-- 맛집 -->
+  <div id="sec-food">
+    <div class="sh fi"><div class="st">🍜 맛집 · 배달</div><div class="sm2" onclick="showPage('explore')">더보기</div></div>
+    <div class="fcard fi" onclick="openAI('🍜 맛집 AI 분석','요즘 MZ세대 핫플 맛집 트렌드를 분석해줘. 성수동·연남동 신상 포함, 섹시푸드 트렌드, 짧고 재밌게.','리뷰 5,200개 기반 분석')">
+      <div class="fcard-th" style="background:linear-gradient(135deg,var(--odim),#FFD9BE)">🍣</div>
+      <div class="fcard-bd">
+        <span class="chip" style="background:var(--odim);color:var(--orange);margin-bottom:7px">🔥 오늘의 핫플</span>
+        <div class="fcard-tt">"성수 오마카세 웨이팅 4시간... 근데 왜 자꾸 가?"</div>
+        <div class="fcard-ds">MZ들이 가성비보다 경험에 돈 쓰는 트렌드. 섹시푸드 열풍에 숨겨진 이유</div>
+        <div class="fcard-ft">
+          <div class="tags"><span class="tag">오마카세</span><span class="tag">성수동</span><span class="tag">섹시푸드</span></div>
+          <button class="abtn sm" onclick="event.stopPropagation();openAI('🍜 맛집 AI','MZ 핫플 맛집 트렌드, 섹시푸드, 성수·연남동 포함해 재밌게 분석해줘.','리뷰 5,200개 분석')">⚡ AI</button>
+        </div>
+      </div>
+    </div>
+    <div class="hscroll fi" id="delivery-sc" style="padding-bottom:4px;margin-bottom:10px"></div>
+  </div>
+
+  <!-- 재테크 (실시간) -->
+  <div id="sec-stock">
+    <div class="sh fi">
+      <div class="st">📈 재테크 <span class="livedot"></span></div>
+      <button class="rfbtn" onclick="loadFinance()">🔄 새로고침</button>
+    </div>
+    <div class="card fi">
+      <div style="padding:12px 14px 0">
+        <span class="chip" style="background:var(--rdim);color:var(--red);margin-bottom:6px">⚡ 실시간 시세</span>
+        <div style="font-size:14px;font-weight:800;line-height:1.4;margin-bottom:4px">"지금 시장 어때? AI가 직접 뽑아봄"</div>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:10px">CoinGecko · Finnhub 실시간 연동</div>
+        <button class="abtn sm" style="margin-bottom:12px" onclick="openAI('📈 시장 AI 분석','현재 암호화폐·주식 시장 현황을 MZ 투자자 관점에서 쉽게 설명해줘. 투자 참고용 정보임 명시해줘.','실시간 데이터 기반')">⚡ 시장 분석</button>
+      </div>
+      <div class="ubar"><span class="utxt" id="fin-updated">로딩 중...</span><button class="rfbtn" onclick="loadFinance()">새로고침</button></div>
+      <div class="div2"></div>
+      <div id="ticker-list"><div id="ticker-sk"></div></div>
+    </div>
+  </div>
+
+  <!-- 패션 -->
+  <div id="sec-fashion">
+    <div class="sh fi"><div class="st">👗 패션 · 트렌드</div><div class="sm2">더보기</div></div>
+    <div class="fcard fi" onclick="openAI('👗 패션 트렌드 AI','2025 봄 MZ 패션 트렌드 느좋 무드와 Y2K를 재밌게 분석해줘. 어디서 사면 좋은지 포함.','인스타 해시태그 30만개 분석')">
+      <div class="fcard-th" style="background:linear-gradient(135deg,var(--pdim),#FFD4E0)">👗</div>
+      <div class="fcard-bd">
+        <span class="chip" style="background:var(--pdim);color:var(--pink);margin-bottom:7px">✨ 이번 주 트렌드</span>
+        <div class="fcard-tt">"올봄 느좋 무드는 바로 이것... 하이퍼 Y2K"</div>
+        <div class="fcard-ds">무신사·지그재그 검색량 폭발. 느낌 좋은 스타일링 AI가 정리했어</div>
+        <div class="fcard-ft">
+          <div class="tags"><span class="tag">느좋</span><span class="tag">Y2K</span><span class="tag">봄코디</span></div>
+          <button class="abtn sm" onclick="event.stopPropagation();openAI('👗 패션 AI','2025 봄 MZ 패션 트렌드를 재밌게 분석해줘.','인스타 30만 해시태그 분석')">⚡ AI</button>
+        </div>
+      </div>
+    </div>
+    <div class="hscroll fi" id="fashion-sc" style="padding-bottom:4px;margin-bottom:10px"></div>
+  </div>
+
+  <!-- 유행 -->
+  <div id="sec-trend">
+    <div class="sh fi"><div class="st">🔥 지금 유행</div><div class="sm2">더보기</div></div>
+    <div class="fcard fi" onclick="openAI('🔥 트렌드 AI','젠지스테어, GMG, 위쑤시개 등 2025 최신 MZ 트렌드를 재밌게 분석해줘.','숏폼 트렌드 분석')">
+      <div class="fcard-th" style="background:linear-gradient(135deg,var(--vdim),#D8D0FF)">🌊</div>
+      <div class="fcard-bd">
+        <span class="chip" style="background:var(--vdim);color:var(--purple);margin-bottom:7px">🌊 바이럴</span>
+        <div class="fcard-tt">"젠지 스테어가 뭔지 모르면 아싸 확정"</div>
+        <div class="fcard-ds">Z세대 특유의 무표정 응시 문화. 국내외 동시 바이럴 중</div>
+        <div class="fcard-ft">
+          <div class="tags"><span class="tag">젠지스테어</span><span class="tag">Z세대</span><span class="tag">밈</span></div>
+          <button class="abtn sm" onclick="event.stopPropagation();openAI('🔥 트렌드 AI','젠지스테어, GMG, 위쑤시개 2025 MZ 트렌드 분석해줘.','숏폼 분석')">⚡ AI</button>
+        </div>
+      </div>
+    </div>
+    <div class="card fi">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+        <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--purple));display:flex;align-items:center;justify-content:center;font-size:15px">😭</div>
+        <div style="font-size:13px;font-weight:700">오늘의 밈</div>
+        <div style="margin-left:auto;font-size:10px;color:var(--t3)">방금 전</div>
+      </div>
+      <div style="padding:16px 14px 8px;font-size:17px;font-weight:900;text-align:center;line-height:1.45">
+        상사: "다들 의견 있으면<br>말해봐요~"<br><span style="color:var(--t3);font-size:13px">나:</span><br>🦗🦗🦗
+      </div>
+      <div style="display:flex;gap:6px;padding:7px 14px 13px;flex-wrap:wrap">
+        <div class="badge br" style="cursor:pointer;padding:5px 11px" onclick="toast('😭 공감!')">😭 4.2만</div>
+        <div class="badge bg2" style="cursor:pointer;padding:5px 11px" onclick="toast('💀 공감!')">💀 3.8만</div>
+        <div class="badge bb" style="cursor:pointer;padding:5px 11px" onclick="saveItem('😂','유머','상사 의견 밈')">🔖 저장</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 신조어 -->
+  <div id="sec-word">
+    <div class="sh fi"><div class="st">💬 신조어</div><div class="sm2" onclick="nextWord()">다음 →</div></div>
+    <div id="word-wrap"></div>
+  </div>
+
+  <!-- 유머 -->
+  <div id="sec-humor">
+    <div class="sh fi"><div class="st">😂 유머 · 짤</div><div class="sm2">더보기</div></div>
+    <div class="card fi">
+      <div class="mitem" onclick="saveItem('😂','유머','월요일 아침 나 vs 커피')"><div class="mt">월요일 아침 나 vs 커피</div><div class="ms">직장인 공감 100% · 추천 8.1만</div></div>
+      <div class="mitem" onclick="saveItem('😂','유머','스불재 상황 모음.zip')"><div class="mt">"스불재" 상황 모음.zip</div><div class="ms">스스로 불러온 재앙들 · 추천 6.4만</div></div>
+      <div class="mitem" onclick="saveItem('😂','유머','GMG 활용 상황 총정리')"><div class="mt">GMG 활용 상황 총정리</div><div class="ms">가면 가? 시리즈 · 추천 5.9만</div></div>
+      <div class="mitem" onclick="openAI('😂 유머 AI','요즘 MZ들 직장·학교 공감 유머 3가지 만들어줘. 스불재, GMG, 위쑤시개 신조어 활용해서.','AI 유머 생성')"><div class="mt" style="color:var(--blue)">⚡ AI 맞춤 유머 생성하기</div><div class="ms">나만의 공감 밈 만들기</div></div>
+    </div>
+  </div>
+</div><!-- /home -->
+
+<!-- ══ EXPLORE ══ -->
+<div class="page" id="page-explore">
+  <div class="sbar2 fi">
+    <span style="font-size:15px;flex-shrink:0">🔍</span>
+    <input class="sinput" placeholder="맛집, 신조어, 종목 검색..." id="srch" oninput="doSearch(this.value)">
+    <span style="font-size:13px;cursor:pointer;color:var(--t3)" onclick="document.getElementById('srch').value='';doSearch('')">✕</span>
+  </div>
+  <div id="search-res" style="display:none">
+    <div class="sh"><div class="st" id="sr-title">검색 결과</div></div>
+    <div class="card" id="sr-list"></div>
+  </div>
+  <div class="sh fi" style="padding-top:14px"><div class="st">카테고리</div></div>
+  <div class="egrid fi">
+    <div class="eitem" onclick="showPage('home');setTimeout(()=>scrollTo2('sec-food'),180)" style="border-top-color:var(--orange)"><div class="ei-ico">🍜</div><div class="ei-n">맛집 · 배달</div><div class="ei-c">콘텐츠 238개</div></div>
+    <div class="eitem" onclick="showPage('home');setTimeout(()=>scrollTo2('sec-stock'),180)" style="border-top-color:var(--red)"><div class="ei-ico">📈</div><div class="ei-n">주식 · 코인</div><div class="ei-c">실시간 연동</div></div>
+    <div class="eitem" onclick="showPage('home');setTimeout(()=>scrollTo2('sec-fashion'),180)" style="border-top-color:var(--pink)"><div class="ei-ico">👗</div><div class="ei-n">패션 · 유행</div><div class="ei-c">콘텐츠 312개</div></div>
+    <div class="eitem" onclick="toast('🛍️ 쿠팡 · 쇼핑!')" style="border-top-color:var(--blue)"><div class="ei-ico">🛒</div><div class="ei-n">쿠팡 · 쇼핑</div><div class="ei-c">콘텐츠 427개</div></div>
+    <div class="eitem" onclick="showPage('home');setTimeout(()=>scrollTo2('sec-word'),180)" style="border-top-color:var(--purple)"><div class="ei-ico">💬</div><div class="ei-n">신조어 사전</div><div class="ei-c">단어 156개</div></div>
+    <div class="eitem" onclick="showPage('home');setTimeout(()=>scrollTo2('sec-humor'),180)" style="border-top-color:var(--yellow)"><div class="ei-ico">😂</div><div class="ei-n">유머 · 밈</div><div class="ei-c">콘텐츠 893개</div></div>
+  </div>
+  <div class="sh fi"><div class="st">🔥 실시간 급상승</div><div class="sm2" style="font-size:10px;color:var(--t3)">실시간</div></div>
+  <div class="card fi"><div id="tr-list"></div></div>
+  <div class="sh fi" style="padding-top:6px"><div class="st">💬 신조어 사전</div></div>
+  <div class="hscroll fi" id="word-exp" style="padding-bottom:10px;margin-bottom:4px"></div>
+</div>
+
+<!-- ══ AI ══ -->
+<div class="page" id="page-ai">
+  <div class="aihero fi">
+    <div class="ah-b">ZIPP AI</div>
+    <div class="ah-t">궁금한 거 뭐든<br>물어봐 ⚡</div>
+    <div class="ah-s">맛집, 재테크, 패션, 신조어 다 돼</div>
+    <div class="aichips">
+      <div class="aic" onclick="setChat('오늘 핫한 맛집 추천해줘')">🍜 오늘 핫플</div>
+      <div class="aic" onclick="setChat('요즘 주식·코인 어때?')">📈 시장 현황</div>
+      <div class="aic" onclick="setChat('2025 봄 패션 트렌드 알려줘')">👗 패션</div>
+      <div class="aic" onclick="setChat('위쑤시개가 뭐야?')">💬 신조어</div>
+    </div>
+  </div>
+  <div class="chatbox fi">
+    <div class="chathead">
+      <div class="chav">⚡</div>
+      <div><div class="chn">ZIPP AI</div><div class="chs">● 온라인</div></div>
+    </div>
+    <div class="chatmsgs" id="chatmsgs">
+      <div class="bub ai">안녕! 나는 ZIPP AI야 ⚡<br>맛집, 재테크, 신조어, 뭐든 물어봐!</div>
+    </div>
+    <div class="chatinp">
+      <input class="cinput" placeholder="메시지 입력..." id="chat-in" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="csend" onclick="sendChat()">↑</button>
+    </div>
+  </div>
+  <div class="sh fi" style="padding-top:6px"><div class="st">💡 많이 묻는 질문</div></div>
+  <div class="card fi">
+    <div class="qqs">
+      <div class="qi" onclick="askQ('요즘 MZ 핫한 맛집 트렌드가 뭐야?')"><div class="qi-q">🍜 요즘 진짜 핫한 맛집은?</div><div class="qi-a">섹시푸드·오마카세·고물가 대응 분석</div></div>
+      <div class="qi" onclick="askQ('2025년 코인 투자 지금 해도 돼? 리스크와 기회 알려줘')"><div class="qi-q">💰 코인 지금 해도 돼?</div><div class="qi-a">시장 현황과 리스크 균형 분석</div></div>
+      <div class="qi" onclick="askQ('GMG, 스불재, 느좋, 위쑤시개 신조어 한번에 정리해줘')"><div class="qi-q">💬 신조어 한번에 정리해줘</div><div class="qi-a">2025 최신 신조어 총정리</div></div>
+      <div class="qi" onclick="askQ('2025 봄 느좋 나오는 MZ 패션 코디 알려줘')"><div class="qi-q">👗 느좋 나오는 봄 코디는?</div><div class="qi-a">2025 봄 트렌드 스타일링</div></div>
+      <div class="qi" onclick="askQ('오늘 비트코인 이더리움 시세 어때?')"><div class="qi-q">📊 오늘 코인 시세 요약</div><div class="qi-a">실시간 데이터 기반 요약</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SAVE ══ -->
+<div class="page" id="page-save">
+  <div class="sh fi"><div class="st">💾 저장한 콘텐츠</div><div class="sm2" style="color:var(--red)" onclick="clearAll()">전체 삭제</div></div>
+  <div id="save-empty" class="sempty fi"><div class="seico">🗂️</div><div class="set">아직 저장한 게 없어요</div><div class="ses">마음에 드는 콘텐츠를<br>저장해두면 여기서 볼 수 있어요</div></div>
+  <div class="card" id="save-list" style="display:none"></div>
+</div>
+
+<!-- ══ PROFILE ══ -->
+<div class="page" id="page-profile">
+  <div class="ptop fi">
+    <div class="prow">
+      <div class="pav">🐣</div>
+      <div><div class="pn">MZ유저</div><div class="ps">ZIPP 골드 멤버 ⚡</div></div>
+      <button class="pedit" onclick="toast('프로필 편집!')">편집</button>
+    </div>
+    <div class="pstats">
+      <div class="pst"><div class="pstn" id="prof-saved">0</div><div class="pstl">저장</div></div>
+      <div class="pst"><div class="pstn">14</div><div class="pstl">연속 방문</div></div>
+      <div class="pst"><div class="pstn">231</div><div class="pstl">읽은 콘텐츠</div></div>
+    </div>
+    <div class="pintwrap">
+      <div class="pint-t">관심 카테고리</div>
+      <div class="pintags" id="int-tags"></div>
+    </div>
+  </div>
+  <div style="height:7px"></div>
+  <div class="msec fi">
+    <div class="mmi" onclick="toggleDark()">
+      <span class="mmico">🌙</span><span class="mmtx">다크 모드</span>
+      <div class="dtoggle" id="dtog"></div>
+    </div>
+    <div class="mmi" onclick="toast('알림 설정!')"><span class="mmico">🔔</span><span class="mmtx">알림 설정</span><span class="mmbdg">2</span></div>
+    <div class="mmi" onclick="toast('AI 개인화!')"><span class="mmico">⚡</span><span class="mmtx">AI 개인화 설정</span><span class="mmr">›</span></div>
+    <div class="mmi" onclick="toast('글자 크기!')"><span class="mmico">🔤</span><span class="mmtx">글자 크기</span><span class="mmr">›</span></div>
+  </div>
+  <div class="msec fi">
+    <div class="mmi" onclick="toast('카카오 공유!')"><span class="mmico">💛</span><span class="mmtx">카카오 공유</span><span class="mmr">›</span></div>
+    <div class="mmi" onclick="toast('네이버 연동!')"><span class="mmico">🟢</span><span class="mmtx">네이버 계정 연동</span><span class="mmr">연동하기</span></div>
+    <div class="mmi" onclick="toast('구글 연동!')"><span class="mmico">🔵</span><span class="mmtx">구글 계정 연동</span><span class="mmr">›</span></div>
+  </div>
+  <div class="msec fi">
+    <div class="mmi" onclick="toast('데이터 출처: CoinGecko API + Finnhub API · 투자 판단은 본인 책임')"><span class="mmico">📊</span><span class="mmtx">데이터 출처</span><span class="mmr">›</span></div>
+    <div class="mmi" onclick="toast('공지사항!')"><span class="mmico">📢</span><span class="mmtx">공지사항</span><span class="mmr">›</span></div>
+    <div class="mmi" onclick="toast('ZIPP v3.0.0')"><span class="mmico">ℹ️</span><span class="mmtx">앱 정보</span><span class="mmr" style="font-size:11px;color:var(--t3)">v3.0.0</span></div>
+  </div>
+  <div style="height:7px"></div>
+</div>
+
+</div><!-- /pages -->
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <div class="nbtn active" id="nav-home" onclick="showPage('home')"><span class="ni">🏠</span><span class="nl">홈</span></div>
+  <div class="nbtn" id="nav-explore" onclick="showPage('explore')"><span class="ni">🔍</span><span class="nl">탐색</span></div>
+  <div class="nbtn" id="nav-ai" onclick="showPage('ai')"><span class="ni">⚡</span><span class="nl">AI</span></div>
+  <div class="nbtn" id="nav-save" onclick="showPage('save')"><span class="ni">💾</span><span class="nl">저장</span></div>
+  <div class="nbtn" id="nav-profile" onclick="showPage('profile')"><span class="ni">👤</span><span class="nl">내꺼</span></div>
+</div>
+
+</div><!-- /app -->
+
+<!-- MODAL -->
+<div class="mbg" id="mbg" onclick="handleMbg(event)">
+  <div class="msheet" id="msheet">
+    <div class="mhandle"></div>
+    <div class="mhd"><div class="mtit" id="mtit">AI 분석</div><div class="msub2" id="msub2"></div></div>
+    <div class="mbdy"><div class="aresp" id="aresp"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div></div>
+    <button class="mclose" onclick="closeModal()">닫기</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════ DATA ═══════════ */
+const WORDS=[
+  {w:'위쑤시개',p:'[위쑤시개]',d:'위(위장)+쑤시개의 합성어. 스트레스를 풀기 위해 먹는 자극적인 음식. 위를 쑤시는 것 같지만 어쩔 수 없이 먹고 싶은 그 음식.',e:'"오늘 하루 너무 힘들었어... 마라탕 먹어야 해. 진짜 위쑤시개 당긴다 ㅠ"',q:'신조어 위쑤시개의 유래·의미·MZ 공감 이유를 재밌게 설명해줘.'},
+  {w:'GMG',p:'[지엠지]',d:'가면 가(Go Maybe Go)의 이니셜. 상황 봐서 가겠다는 뜻. 확답 없이 가능성을 열어두는 MZ식 표현. HMH(하면 해)와 세트.',e:'"야 오늘 파티 올 거야?" "GMG ㅋㅋ 일 끝나면 봐"',q:'신조어 GMG의 의미와 MZ가 이 표현을 좋아하는 이유를 재밌게 설명해줘.'},
+  {w:'느좋',p:'[느좋]',d:'느낌 좋다의 앞글자 줄임말. 어떤 분위기·조합이 마음에 들 때 쓰는 만능 칭찬 표현. 단독으로도 수식어로도 가능.',e:'"오늘 카페 완전 느좋이다 ㄷㄷ" "이 코디 느좋 실화냐"',q:'신조어 느좋의 의미와 다양한 활용 예시를 MZ 감성으로 설명해줘.'},
+  {w:'젠지 스테어',p:'[젠지 스테어]',d:'Gen-Z Stare. Z세대 특유의 무표정 응시. 어떤 상황에도 리액션 없이 그냥 바라보는 행동. 무례하다 vs 쿨하다 논란.',e:'발표 끝나고 "피드백 있어요?" 했는데 팀원 전원: 👁️👁️',q:'신조어 젠지스테어의 의미와 왜 화제인지, MZ 문화적 의미를 분석해줘.'},
+  {w:'스불재',p:'[스불재]',d:'스스로 불러온 재앙의 줄임말. 자신의 선택으로 인한 불행을 셀프 디스할 때 사용.',e:'"밤새 게임하고 아침 회의 있는데... 완전 스불재 ㅋㅋ"',q:'신조어 스불재의 의미와 MZ 공감 포인트를 재밌게 설명해줘.'},
+];
+const TRENDS=[
+  {r:1,n:'젠지 스테어',s:'Z세대 무표정 응시 밈',b:'bo',t:'HOT'},
+  {r:2,n:'위쑤시개',s:'스트레스 해소 자극 음식',b:'br',t:'NEW'},
+  {r:3,n:'성수 오마카세',s:'맛집 · 2시간 웨이팅',b:'bg2',t:'↑급상승'},
+  {r:4,n:'GMG (가면가)',s:'요즘 10대 유행 표현',b:'br',t:'NEW'},
+  {r:5,n:'AI 반도체',s:'주식 · 3일 연속 급등',b:'bo',t:'HOT'},
+  {r:6,n:'느좋',s:'느낌 좋다 만능 칭찬어',b:'bg2',t:'↑상승'},
+  {r:7,n:'스불재',s:'스스로 불러온 재앙',b:'bb',t:'↑상승'},
+];
+const FASHION=[
+  {e:'🧥',n:'Y2K 데님 재킷',st:'무신사',pr:'39,900원~',hot:true,bg:'var(--bdim)'},
+  {e:'👟',n:'뉴발 9060 화이트',st:'에이블리',pr:'129,000원',hot:false,bg:'var(--vdim)'},
+  {e:'🕶️',n:'빅프레임 선글라스',st:'에이블리',pr:'12,900원~',hot:true,bg:'var(--ydim)'},
+  {e:'👜',n:'미니 버킷백',st:'지그재그',pr:'25,000원~',hot:false,bg:'var(--pdim)'},
+];
+const DELIVERY=[
+  {e:'🌶️',n:'마라탕 1인분 세트',m:'⏱22분 · ⭐4.9',b:'br',bt:'-3,000원',p:'16,000원'},
+  {e:'🍱',n:'스시 도시락 오늘특가',m:'⏱30분 · ⭐4.8',b:'bo',bt:'오늘만',p:'28,000원'},
+  {e:'🍔',n:'스매시 버거 신메뉴',m:'⏱18분 · ⭐4.7',b:'bb',bt:'신규할인',p:'12,900원'},
+];
+const COINS=[
+  {id:'bitcoin',n:'비트코인',c:'BTC',e:'₿',bg:'var(--odim)',q:'비트코인 현황을 MZ 투자자 관점에서 짧게 설명해줘. 투자 참고용.'},
+  {id:'ethereum',n:'이더리움',c:'ETH',e:'Ξ',bg:'var(--vdim)',q:'이더리움 현황을 MZ 투자자 관점에서 짧게 설명해줘. 투자 참고용.'},
+  {id:'solana',n:'솔라나',c:'SOL',e:'◎',bg:'var(--gdim)',q:'솔라나 현황을 MZ 투자자 관점에서 짧게 설명해줘. 투자 참고용.'},
+  {id:'ripple',n:'리플',c:'XRP',e:'✕',bg:'var(--bdim)',q:'리플 현황을 MZ 투자자 관점에서 짧게 설명해줘. 투자 참고용.'},
+  {id:'dogecoin',n:'도지코인',c:'DOGE',e:'Ð',bg:'var(--ydim)',q:'도지코인 현황을 MZ 투자자 관점에서 짧게 설명해줘. 투자 참고용.'},
+];
+
+/* ═══════════ STATE ═══════════ */
+let curPage='home',wordIdx=0,savedItems=[],isDark=false,toastT;
+const interests=['🍜 맛집','📈 재테크','👗 패션','💬 신조어','😂 유머','🔥 유행'];
+let actInts=new Set(['🍜 맛집','📈 재테크','👗 패션']);
+const chatHist=[];
+
+/* ═══════════ INIT ═══════════ */
+function init(){
+  updateClock(); setInterval(updateClock,30000);
+  buildDelivery(); buildFashion(); buildTrending(); buildWordExp();
+  renderWord(); renderInts(); loadFinance();
+  setInterval(loadFinance,90000);
+  document.getElementById('ab-cnt').textContent='23개 큐레이팅 완료';
+  buildTickerSkeleton();
+}
+function updateClock(){const n=new Date();document.getElementById('st').textContent=`${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`}
+
+/* ═══════════ DARK MODE ═══════════ */
+function toggleDark(){
+  isDark=!isDark;
+  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('darkBtn').textContent=isDark?'☀️':'🌙';
+  document.getElementById('themeColor').setAttribute('content',isDark?'#0D0F17':'#ffffff');
+  const tog=document.getElementById('dtog'); if(tog) tog.classList.toggle('on',isDark);
+  toast(isDark?'🌙 다크 모드 ON':'☀️ 라이트 모드 ON');
+}
+
+/* ═══════════ NAVIGATION ═══════════ */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nbtn').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  document.getElementById(`nav-${name}`).classList.add('active');
+  curPage=name;
+  if(name==='save') renderSaved();
+  if(name==='profile') document.getElementById('prof-saved').textContent=savedItems.length;
+}
+function scrollTo2(id){
+  const el=document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ═══════════ BUILD SECTIONS ═══════════ */
+function buildDelivery(){
+  const w=document.getElementById('delivery-sc');
+  DELIVERY.forEach(d=>{
+    const el=document.createElement('div');
+    el.className='dcard';
+    el.innerHTML=`<div class="dcard-ico">${d.e}</div><div class="dcard-n">${d.n}</div><div class="dcard-m">${d.m}</div><div class="dcard-pr"><span class="badge ${d.b}">${d.bt}</span><span style="font-size:13px;font-weight:800">${d.p}</span></div>`;
+    el.onclick=()=>saveItem(d.e,'맛집',d.n);
+    w.appendChild(el);
+  });
+}
+function buildFashion(){
+  const w=document.getElementById('fashion-sc');
+  FASHION.forEach(f=>{
+    const el=document.createElement('div');
+    el.style.cssText='min-width:120px;cursor:pointer;flex-shrink:0';
+    el.innerHTML=`<div style="width:120px;height:148px;background:${f.bg};border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:7px;position:relative">${f.e}${f.hot?'<span style="position:absolute;top:6px;left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px">HOT</span>':''}</div><div style="font-size:12px;font-weight:800;margin-bottom:2px">${f.n}</div><div style="font-size:10px;color:var(--t3)">${f.st} <strong style="color:var(--blue)">${f.pr}</strong></div>`;
+    el.onclick=()=>saveItem(f.e,'패션',f.n);
+    w.appendChild(el);
+  });
+}
+function buildTrending(){
+  const w=document.getElementById('tr-list');
+  TRENDS.forEach(t=>{
+    const el=document.createElement('div');
+    el.className='tritem';
+    el.innerHTML=`<div class="trank">${t.r}</div><div class="trinfo"><div class="trn">${t.n}</div><div class="trs">${t.s}</div></div><span class="badge ${t.b}">${t.t}</span>`;
+    el.onclick=()=>openAI(`🔍 ${t.n} 분석`,`${t.n}에 대해 MZ 관점에서 재밌고 간결하게 설명해줘.`,'AI 분석 중');
+    w.appendChild(el);
+  });
+}
+function buildWordExp(){
+  const w=document.getElementById('word-exp');
+  const cols=['color:var(--blue)','color:var(--orange)','color:var(--red)','color:var(--purple)','color:var(--green)'];
+  WORDS.forEach((ww,i)=>{
+    const el=document.createElement('div');
+    el.className='wmini';
+    el.innerHTML=`<div class="wmt" style="${cols[i%cols.length]}">💬 신조어</div><div class="wmw">${ww.w}</div><div class="wmd">${ww.d.slice(0,38)}...</div>`;
+    el.onclick=()=>openAI(`💬 ${ww.w} 해설`,ww.q,'신조어 AI 분석');
+    w.appendChild(el);
+  });
+}
+
+/* ═══════════ WORD CARD ═══════════ */
+function renderWord(){
+  const ww=WORDS[wordIdx%WORDS.length];
+  document.getElementById('word-wrap').innerHTML=`
+    <div class="wcard fi" data-w="${ww.w.slice(0,1)}">
+      <div class="wday">💬 오늘의 신조어 ${wordIdx+1}/${WORDS.length}</div>
+      <div class="wmn">${ww.w}</div>
+      <div class="wpr">${ww.p}</div>
+      <div class="wdf">${ww.d}</div>
+      <div class="wex">💬 ${ww.e}</div>
+      <div class="wacts">
+        <button class="abtn sm" onclick="openAI('💬 ${esc(ww.w)} AI 해설','${esc(ww.q)}','신조어 심층 분석')">⚡ AI 해설</button>
+        <button class="obtn" onclick="nextWord()">다음 →</button>
+        <button class="obtn" onclick="saveItem('💬','신조어','${esc(ww.w)}')">🔖 저장</button>
+      </div>
+    </div>`;
+}
+function nextWord(){wordIdx=(wordIdx+1)%WORDS.length;renderWord()}
+function esc(s){return s.replace(/'/g,"\\'").replace(/"/g,'\\"')}
+
+/* ═══════════ INTERESTS ═══════════ */
+function renderInts(){
+  const w=document.getElementById('int-tags');
+  w.innerHTML='';
+  interests.forEach(i=>{
+    const on=actInts.has(i);
+    const el=document.createElement('div');
+    el.className=`pintag ${on?'on':'off'}`;
+    el.textContent=i;
+    el.onclick=()=>{actInts.has(i)?actInts.delete(i):actInts.add(i);renderInts();toast(`${i} ${actInts.has(i)?'추가':'제거'}`)};
+    w.appendChild(el);
+  });
+}
+
+/* ═══════════ FINANCE (REAL-TIME) ═══════════ */
+function buildTickerSkeleton(){
+  const sk=document.getElementById('ticker-sk');
+  if(!sk) return;
+  sk.innerHTML=Array(5).fill(0).map(()=>`
+    <div class="titem" style="gap:11px">
+      <div class="sk" style="width:38px;height:38px;border-radius:11px;flex-shrink:0"></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+        <div class="sk" style="width:65px;height:12px"></div>
+        <div class="sk" style="width:40px;height:10px"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+        <div class="sk" style="width:62px;height:13px"></div>
+        <div class="sk" style="width:40px;height:10px;border-radius:5px"></div>
+      </div>
+    </div>`).join('');
+}
+
+async function loadFinance(){
+  const tlist=document.getElementById('ticker-list');
+  buildTickerSkeleton();
+  document.getElementById('fin-updated').textContent='데이터 로딩 중...';
+  const results=[];
+
+  /* CoinGecko free endpoint (no key needed) */
+  try{
+    const ids=COINS.map(c=>c.id).join(',');
+    const r=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=krw&include_24hr_change=true`,{headers:{Accept:'application/json'}});
+    if(r.ok){
+      const data=await r.json();
+      COINS.forEach(c=>{
+        const d=data[c.id];
+        if(!d) return;
+        results.push({e:c.e,n:c.n,c:c.c,bg:c.bg,price:fmtKRW(d.krw),chg:d.krw_24h_change??0,q:c.q});
+      });
+    }
+  }catch(err){console.warn('CoinGecko:',err)}
+
+  /* Finnhub demo (public) */
+  const stocks=[
+    {sym:'005930',n:'삼성전자',c:'005930',e:'📱',bg:'var(--bdim)',q:'삼성전자 주가 현황을 MZ 관점에서 짧게 설명해줘. 투자 참고용.'},
+    {sym:'NVDA',n:'엔비디아',c:'NVDA',e:'🟢',bg:'var(--gdim)',q:'엔비디아 주가 현황을 MZ 관점에서 짧게 설명해줘. 투자 참고용.'},
+  ];
+  for(const s of stocks){
+    try{
+      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${s.sym}&token=demo`);
+      if(r.ok){
+        const d=await r.json();
+        if(d&&d.c>0){
+          const chg=d.dp??((d.c-d.pc)/d.pc*100);
+          const priceStr=s.sym==='005930'?fmtKRW(d.c*1350):`$${d.c.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+          results.push({e:s.e,n:s.n,c:s.c,bg:s.bg,price:priceStr,chg,q:s.q});
+        }
+      }
+    }catch(err){console.warn('Finnhub:',err)}
+  }
+
+  /* Fallback if all APIs fail */
+  if(!results.length){
+    results.push(
+      {e:'₿',n:'비트코인',c:'BTC',bg:'var(--odim)',price:'₩96,200만',chg:4.7,q:'비트코인 현황 분석해줘'},
+      {e:'Ξ',n:'이더리움',c:'ETH',bg:'var(--vdim)',price:'₩482만',chg:2.1,q:'이더리움 현황 분석해줘'},
+      {e:'◎',n:'솔라나',c:'SOL',bg:'var(--gdim)',price:'₩18만',chg:-1.2,q:'솔라나 현황 분석해줘'},
+      {e:'✕',n:'리플',c:'XRP',bg:'var(--bdim)',price:'₩1,240',chg:6.3,q:'리플 현황 분석해줘'},
+      {e:'📱',n:'삼성전자',c:'005930',bg:'var(--bdim)',price:'₩79,400',chg:2.3,q:'삼성전자 현황 분석해줘'},
+      {e:'🟢',n:'엔비디아',c:'NVDA',bg:'var(--gdim)',price:'$875.40',chg:3.1,q:'엔비디아 현황 분석해줘'},
+    );
+  }
+
+  tlist.innerHTML=results.map(t=>{
+    const pct=(t.chg>=0?'+':'')+t.chg.toFixed(2)+'%';
+    const cls=t.chg>0?'upbg':t.chg<0?'dnbg':'flatbg';
+    return `<div class="titem" onclick="openAI('${esc(t.n)} AI 분석','${esc(t.q)}','참고 정보 · 투자 판단은 본인 책임')">
+      <div class="tico" style="background:${t.bg}">${t.e}</div>
+      <div><div class="tnm">${t.n}</div><div class="tsb">${t.c}</div></div>
+      <div class="trt"><div class="tpr">${t.price}</div><span class="tch ${cls}">${pct}</span></div>
+    </div>`;
+  }).join('');
+
+  const now=new Date();
+  document.getElementById('fin-updated').textContent=
+    `업데이트 ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} · CoinGecko · Finnhub`;
+}
+
+function fmtKRW(n){
+  if(n>=1e8) return `₩${(n/1e8).toFixed(2)}억`;
+  if(n>=1e4) return `₩${Math.round(n/1000)}만`;
+  return `₩${Math.round(n).toLocaleString('ko-KR')}`;
+}
+
+/* ═══════════ AI MODAL ═══════════ */
+async function openAI(title,prompt,sub){
+  document.getElementById('mtit').textContent=title;
+  document.getElementById('msub2').textContent=sub;
+  document.getElementById('aresp').innerHTML='<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  document.getElementById('mbg').classList.add('open');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,
+        system:'너는 ZIPP의 MZ세대 전문 AI 큐레이터야. 답변은 항상 한국어로, 이모지 2~3개 포함, 짧고 임팩트 있게, MZ 감성으로 써줘. 150~250자 이내.',
+        messages:[{role:'user',content:prompt}]})
+    });
+    const d=await res.json();
+    document.getElementById('aresp').innerHTML=(d.content?.[0]?.text||'분석 실패 😢').replace(/\n/g,'<br>');
+  }catch{document.getElementById('aresp').innerHTML='⚠️ 연결 오류! 잠시 후 재시도해줘'}
+}
+function closeModal(){document.getElementById('mbg').classList.remove('open')}
+function handleMbg(e){if(e.target===document.getElementById('mbg')) closeModal()}
+
+/* ═══════════ AI CHAT ═══════════ */
+async function sendChat(){
+  const inp=document.getElementById('chat-in');
+  const text=inp.value.trim(); if(!text) return;
+  inp.value='';
+  addBub(text,'user');
+  const el=addBub('...','ai');
+  try{
+    chatHist.push({role:'user',content:text});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,
+        system:'너는 ZIPP AI야. MZ세대 전문. 맛집, 재테크, 패션, 신조어 특화. 짧고 친근하게, 이모지 1~2개, 100~180자 이내.',
+        messages:chatHist})
+    });
+    const d=await res.json();
+    const reply=d.content?.[0]?.text||'모르겠어 😅 다시 물어봐!';
+    chatHist.push({role:'assistant',content:reply});
+    el.innerHTML=reply.replace(/\n/g,'<br>');
+  }catch{el.textContent='⚠️ 연결 오류!'}
+  const msgs=document.getElementById('chatmsgs');
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function addBub(text,who){
+  const msgs=document.getElementById('chatmsgs');
+  const el=document.createElement('div');
+  el.className=`bub ${who}`;el.textContent=text;
+  msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;
+}
+function setChat(t){document.getElementById('chat-in').value=t}
+function askQ(q){setChat(q);sendChat()}
+
+/* ═══════════ SAVE ═══════════ */
+function saveItem(icon,cat,title){
+  if(savedItems.find(i=>i.title===title)){toast('이미 저장됐어요!');return}
+  savedItems.unshift({icon,cat,title,time:'방금 전'});
+  toast(`🔖 "${title}" 저장!`);
+  if(curPage==='save') renderSaved();
+  document.getElementById('prof-saved').textContent=savedItems.length;
+}
+function renderSaved(){
+  const empty=document.getElementById('save-empty');
+  const listEl=document.getElementById('save-list');
+  if(!savedItems.length){empty.style.display='flex';listEl.style.display='none';return}
+  empty.style.display='none';listEl.style.display='block';
+  listEl.innerHTML=savedItems.map((item,i)=>`
+    <div class="sitem" style="animation:fu .2s ${i*.04}s both">
+      <div class="sico">${item.icon}</div>
+      <div class="sinf"><div class="scat">${item.cat}</div><div class="stit">${item.title}</div><div class="stm">${item.time}</div></div>
+      <button class="sdel" onclick="delSaved(${i})">✕</button>
+    </div>`).join('');
+}
+function delSaved(i){savedItems.splice(i,1);renderSaved();document.getElementById('prof-saved').textContent=savedItems.length;toast('삭제됐어요')}
+function clearAll(){if(!savedItems.length){toast('저장된 게 없어요');return}savedItems=[];renderSaved();document.getElementById('prof-saved').textContent=0;toast('전체 삭제!')}
+
+/* ═══════════ SEARCH ═══════════ */
+const SEARCHABLE=[
+  ...WORDS.map(w=>({i:'💬',c:'신조어',t:w.w,s:w.d.slice(0,36)+'...'})),
+  ...TRENDS.map(t=>({i:'🔥',c:'트렌드',t:t.n,s:t.s})),
+  ...DELIVERY.map(d=>({i:d.e,c:'맛집',t:d.n,s:d.p})),
+  ...FASHION.map(f=>({i:f.e,c:'패션',t:f.n,s:f.st+' '+f.pr})),
+  ...COINS.map(c=>({i:c.e,c:'재테크',t:c.n+' ('+c.c+')',s:'실시간 시세 조회 가능'})),
+];
+function doSearch(val){
+  const res=document.getElementById('search-res');
+  const list=document.getElementById('sr-list');
+  const title=document.getElementById('sr-title');
+  if(!val.trim()){res.style.display='none';return}
+  const found=SEARCHABLE.filter(x=>x.t.includes(val)||x.s.includes(val)||x.c.includes(val));
+  title.textContent=`"${val}" 검색 결과 ${found.length}건`;
+  list.innerHTML=!found.length
+    ?'<div style="padding:18px 14px;text-align:center;color:var(--t3);font-size:13px">검색 결과가 없어요 😅</div>'
+    :found.map(r=>`<div class="sitem" onclick="toast('${esc(r.t)} 선택!')" style="cursor:pointer"><div class="sico">${r.i}</div><div class="sinf"><div class="scat">${r.c}</div><div class="stit">${r.t}</div><div class="stm">${r.s}</div></div></div>`).join('');
+  res.style.display='block';
+}
+
+/* ═══════════ TOAST ═══════════ */
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2100);
+}
+
+/* ═══════════ BOOT ═══════════ */
+init();
+</script>
+</body>
+</html>
